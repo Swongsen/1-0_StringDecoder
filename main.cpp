@@ -14,36 +14,60 @@ string interleaving(string s, string x, string y){
   int xspot = 0;
   int yspot = 0;
   bool xfound = false;
-  string newstring;
-  string finalstring;
-  // Goes through s and checks if x string is in it. If an x string is fully found, reset spot to 0
-  // and keep checking to see if there are more. Rebuild string without the found x string(s).
+  string newstring;    // Used for figuring out the leftover symbols needed for y to determine if interweaving
+  string whole_string; // Used for holding the entire sequence of symbols
+  string diff_string;  // Used for holding only the differing sequence of symbols between x and s or y and the remaining symbols
+  string finalstring;  // Not necessarily needed. Just used for debugging purposes. If len > 0, result has to be false
+
+  // Comparing x string to s string
   for(int i = 0; i < s.length(); i++){
-    // If in the initial string, the subsequence element is not found at a spot, add it to the new string.
-    // The || condition is making sure that the remaining unchecked string is still longer than x.
-    if(x.at(xspot) != s.at(i) || (s.length() - i < x.length() - xspot) ){
-      newstring += s.at(i);
-    }
-    else if(x.at(xspot) == s.at(i)){
+    // Add every element in s to the temporary whole string.
+    whole_string += s.at(i);
+    if(x.at(xspot) == s.at(i)){
       xspot++;
+      // If a full x sequence is found, add all of the differing elements found to newstring,
+      // reset the xspot, mark xfound as true, and reset both the temp string to restart the process for rest of elements in s.
       if(xspot == x.length()){
+        newstring += diff_string;
         xspot = 0;
         xfound = true;
+        diff_string.clear();
+        whole_string.clear();
       }
+    }
+    else if(x.at(xspot) != s.at(i) ){
+      diff_string += s.at(i);
+    }
+    // If it reaches the last element in s, add the remaining string to the newstring.
+    // If the last element is a final piece of x in s, then whole_string should be reset
+    // earlier so this wouldn't add anything.
+    if(i == s.length()-1){
+      newstring += whole_string;
     }
   }
 
-  // Same concept for checking if x is a subsequence. However, don't need to be as precise when building the final string
-  // because if there is even 1 thing in the final string, then it is not interweaving.
+  cout << "Newstring: " + newstring + "\n";
+  diff_string.clear();
+  whole_string.clear();
+
+  // Uses newstring string built from x and s to compare for y. Exact same logic
   for(int i = 0; i < newstring.length(); i++){
-    if(y.at(yspot) != newstring.at(i) || (newstring.length() - i < y.length() - yspot)){
-      finalstring += newstring.at(i);
-    }
-    else if(y.at(yspot) == newstring.at(i)){
+    whole_string += newstring.at(i);
+    if(y.at(yspot) == newstring.at(i)){
       yspot++;
       if(yspot == y.length()){
+        finalstring += diff_string;
+        diff_string.clear();
+        whole_string.clear();
         yspot = 0;
       }
+    }
+    else if(y.at(yspot) != newstring.at(i)){
+      diff_string += newstring.at(i);
+    }
+
+    if(i == newstring.length() - 1){
+      finalstring += whole_string;
     }
   }
 
