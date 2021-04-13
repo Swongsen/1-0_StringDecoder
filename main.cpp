@@ -13,38 +13,42 @@ string interleaving(string s, string x, string y){
 
   int xspot = 0;
   int yspot = 0;
+  bool xfound = false;
   string newstring;
   string finalstring;
   // Goes through s and checks if x string is in it. If an x string is fully found, reset spot to 0
   // and keep checking to see if there are more. Rebuild string without the found x string(s).
   for(int i = 0; i < s.length(); i++){
-    if(x.at(xspot) == s.at(i)){
+    // If in the initial string, the subsequence element is not found at a spot, add it to the new string.
+    // The || condition is making sure that the remaining unchecked string is still longer than x.
+    if(x.at(xspot) != s.at(i) || (s.length() - i < x.length() - xspot) ){
+      newstring += s.at(i);
+    }
+    else if(x.at(xspot) == s.at(i)){
       xspot++;
       if(xspot == x.length()){
         xspot = 0;
+        xfound = true;
       }
     }
-    // If in the initial string, the subsequence element is not found at a spot, add it to the new string.
-    // The || condition is making sure that the remaining unchecked string is still longer than x.
-    else if(x.at(xspot) != s.at(i) || ((s.length() - i) < x.length()) ){
-      newstring += s.at(i);
-    }
   }
-  cout << newstring;
 
+  // Same concept for checking if x is a subsequence. However, don't need to be as precise when building the final string
+  // because if there is even 1 thing in the final string, then it is not interweaving.
   for(int i = 0; i < newstring.length(); i++){
-    if(y.at(yspot) == newstring.at(i)){
+    if(y.at(yspot) != newstring.at(i) || (newstring.length() - i < y.length() - yspot)){
+      finalstring += newstring.at(i);
+    }
+    else if(y.at(yspot) == newstring.at(i)){
       yspot++;
       if(yspot == y.length()){
         yspot = 0;
       }
     }
-    else if(y.at(yspot) != newstring.at(i)){
-      finalstring += newstring.at(i);
-    }
   }
 
-  if(finalstring.length() != 0){
+  // If there is nothing in the final string, then it is interweaving. If there is something, then it is not interweaving.
+  if(finalstring.length() != 0 || xfound == false){
     result = "\false";
     cout << "Finalstring: " + finalstring + "\n";
   }
